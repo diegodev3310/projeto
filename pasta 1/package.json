@@ -1,0 +1,44 @@
+{
+  "name": "meu-chatbot",
+  "version": "1.0.1",
+  "description": "Chatbot com Puppeteer e WhatsApp Web.js",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "moment-timezone": "^0.5.45",
+    "puppeteer": "^21.3.8",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.28.0"
+  },
+  "devDependencies": {
+    "electron": "^36.3.2",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.seu.chatbot",
+    "productName": "MeuChatBot",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
