@@ -7,6 +7,8 @@ let mainWindow;
 const runningClients = new Map(); // chave = sessionId, valor = processo
 
 function createWindow() {
+  const funcTag = "[createWindow]";
+  console.log(`${funcTag} Creating main window...`);
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
@@ -17,7 +19,9 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile("index.html");
+  console.log(`${funcTag} Loading index.html...`);
+  mainWindow.loadFile("public/index.html");
+  console.log(`${funcTag} Window created successfully.`);
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -25,19 +29,24 @@ function createWindow() {
 }
 
 function listSessions() {
-  const basePath = path.join(__dirname, ".wwebjs_auth");
+  const funcTag = "[listSessions]";
+  console.log(`${funcTag} Listing sessions...`);
+
+  const basePath = path.join(__dirname, "../wwebjs_auth");
   if (!fs.existsSync(basePath)) return [];
   const items = fs.readdirSync(basePath, { withFileTypes: true });
   return items.filter(i => i.isDirectory()).map(i => i.name);
 }
 
 function startClient(sessionId) {
+  const funcTag = "[startClient]";
+  console.log(`${funcTag} Starting client for session: ${sessionId}`);
   if (runningClients.has(sessionId)) {
     mainWindow.webContents.send("bot-error", `Sessão ${sessionId} já está em execução.`);
     return;
   }
 
-  const botPath = path.join(__dirname, "bot.js");
+  const botPath = path.join(__dirname, "./services/bot.js");
   const child = spawn("node", [botPath, sessionId], { stdio: ["pipe", "pipe", "pipe"] });
 
   runningClients.set(sessionId, child);
@@ -81,17 +90,22 @@ function startClient(sessionId) {
   });
 
   child.on("close", code => {
+    console.log(`Client for session ${sessionId} closed with code ${code}`);
     mainWindow.webContents.send("bot-status", { sessionId, status: `Bot encerrado com código ${code}` });
     runningClients.delete(sessionId);
   });
 
   child.on("error", err => {
+    console.log(`Erro ao iniciar cliente para sessão ${sessionId}:`, err);
     mainWindow.webContents.send("bot-error", { sessionId, error: err.message });
     runningClients.delete(sessionId);
   });
 }
 
 function stopClient(sessionId) {
+  const funcTag = "[stopClient]";
+  console.log(`${funcTag} Stopping client for session: ${sessionId}`);
+
   if (runningClients.has(sessionId)) {
     runningClients.get(sessionId).kill();
     runningClients.delete(sessionId);
@@ -103,6 +117,9 @@ function stopClient(sessionId) {
 }
 
 function deleteSession(sessionId) {
+  const funcTag = "[deleteSession]";
+  console.log(`${funcTag} Deleting session: ${sessionId}`);
+
   const sessionPath = path.join(__dirname, ".wwebjs_auth", sessionId);
   if (fs.existsSync(sessionPath)) {
     try {
