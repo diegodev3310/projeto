@@ -33,7 +33,8 @@ $ CREATE DATABASE nome_do_banco OWNER seu_usuario;
 Obs: para ``seu_usuario, sua_senha e nome_do_banco``, utilize os mesmos que cadastrar no arquivo .env
 
 2. Então crie as tabelas contidas no arquivo *init.sql*.
-3. Inicialize o projeto com os comandos:
+
+Por fim, para ambos, inicialize o projeto com os comandos:
 ```
 $ npm install
 $ npm run start
