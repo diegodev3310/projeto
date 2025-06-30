@@ -39,7 +39,7 @@ $ npm install
 $ npm run start
 ```
 
-### Inicializando com Docker:
+### Docker:
 ```
 $ docker-compose up --build
 ```
