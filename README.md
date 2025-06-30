@@ -12,15 +12,18 @@ Para rodar com Docker:
 
 ## Inicializando
 
-- Inicializando o projeto localmente:
+### Localmente:
 
-No Windows:
+- No Windows:
 
-Basta instalar o PostgreSQL, realizar as configurações basicas, acessar o banco de dados via algum SGBD (nativo ou [DBeaver](https://dbeaver.io/)) e criar as tabelas contidas no arquivo *init.sql*.
+1. Basta instalar o PostgreSQL
+2. Realizar as configurações basicas na interface
+3. Acessar o banco de dados via algum SGBD (nativo ou [DBeaver](https://dbeaver.io/))
+4. Criar as tabelas contidas no arquivo *init.sql*.
 
-No Linux:
+- No Linux:
 
-Instale o PostgreSQL, então utilize os comandos:
+1. Instale o PostgreSQL, então utilize os comandos:
 
 ```
 $ sudo -u postgres psql
@@ -29,15 +32,14 @@ $ CREATE DATABASE nome_do_banco OWNER seu_usuario;
 ```
 Obs: para ``seu_usuario, sua_senha e nome_do_banco``, utilize os mesmos que cadastrar no arquivo .env
 
-Então crie as tabelas contidas no arquivo *init.sql*.
-
-Inicialize o projeto com os comandos:
+2. Então crie as tabelas contidas no arquivo *init.sql*.
+3. Inicialize o projeto com os comandos:
 ```
 $ npm install
 $ npm run start
 ```
 
-- Inicializando com Docker:
+### Inicializando com Docker:
 ```
 $ docker-compose up --build
 ```
