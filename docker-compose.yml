@@ -1,0 +1,23 @@
+services:
+  chatbot:
+    image: chatbot_whatsapp:latest
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    networks:
+      - chatbot_network
+    ports:
+      - "${NODE_PORT}:${NODE_PORT}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${DIR_IP}:${NODE_PORT}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  chatbot_network:
+    name: chatbot_network
+    driver: bridge
