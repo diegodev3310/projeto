@@ -12,6 +12,7 @@ RUN npm install --production
 # Copy the application source code
 COPY server.js ./
 COPY public ./public
+COPY src ./src
 
 # Production stage
 # Set the environment to production
