@@ -41,6 +41,7 @@ $ npm run start
 ```
 
 ### Docker:
+Configure o arquivo .env seguindo o .env.example, então execute:
 ```
 $ docker-compose up --build
 ```
