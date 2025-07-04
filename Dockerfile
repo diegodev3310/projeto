@@ -1,6 +1,6 @@
 # Image: Node.js 22.11.0 Slim
 # Description: A Dockerfile for building and running a Node.js application in production mode.
-FROM node:22.11.0-slim as base
+FROM node:22.11.0-slim
 
 # Set the working directory
 WORKDIR /app
@@ -27,11 +27,13 @@ RUN apt-get update && apt-get install -y \
   libxrandr2 \
   xdg-utils \
   --no-install-recommends && \
-  rm -rf /var/lib/apt/lists/*
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json ./
-RUN npm install --production
+RUN npm ci --only=production && npm cache clean --force \
+  && npm prune --production \
+  && npx modclean -r -n default:safe || true
 
 # Copy the application source code
 COPY server.js ./
