@@ -13,7 +13,8 @@ function startBot() {
 
   client = new Client({
 		puppeteer: {
-			headless: false,
+			headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		},
     // authStrategy: new LocalAuth({ dataPath: `../../wwebjs_auth/` }),
   });
