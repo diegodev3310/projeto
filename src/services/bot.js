@@ -36,26 +36,26 @@ function startBot() {
   client.on("message", async msg => {
     if (msg.body.match(/^[a-zA-Z0-9]+$/)) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       const contact = await msg.getContact();
       const name = contact.pushname || "usuário";
       await client.sendMessage(
         msg.from,
         `Olá ${name.split(" ")[0]}! 👩🏾‍⚕️\nSou a Vic, assistente virtual da Clínica Vida e Saúde. Estou aqui para agilizar seu atendimento! Escolha uma das opções abaixo:\n\n1 - Agendar consulta\n2 - Valores de exames e serviços\n3 - Informar chegada na clínica\n4 - Problemas com o App ou agendamento\n5 - Falar com atendente humano\n6 - Solicitar boleto para pagamento`
       );
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(msg.from, 'Você pode digitar "Menu" a qualquer momento para ver novamente as opções.');
     }
 
     if (msg.body === "1" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(
         msg.from,
         "Perfeito! Para agendar sua consulta, por favor envie:\n\n- Nome completo\n- Especialidade desejada\n- Data preferida\n- Convênio (se tiver)\n\nAssim podemos verificar a disponibilidade."
@@ -64,9 +64,9 @@ function startBot() {
 
     if (msg.body === "2" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(
         msg.from,
         "*Valores base:*\n\n- Consulta Clínica Geral: R$ 120,00\n- Exame de Sangue Completo: R$ 85,00\n- Eletrocardiograma: R$ 90,00\n- Ultrassonografia: R$ 150,00"
@@ -81,17 +81,17 @@ function startBot() {
 
     if (msg.body === "3" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(msg.from, "Agradecemos por nos avisar! Por favor dirija-se à recepção com um documento com foto. Bom atendimento!");
     }
 
     if (msg.body === "4" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(
         msg.from,
         "Sem problemas! Nos informe:\n\n- Nome completo\n- CPF\n- Descrição do problema (ex: \"não consigo acessar o app\", \"erro ao agendar\")\n\nVamos te ajudar o mais rápido possível."
@@ -100,17 +100,17 @@ function startBot() {
 
     if (msg.body === "5" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(msg.from, "Tudo certo. Encaminhando você para um de nossos atendentes. Por favor aguarde um momento...");
     }
 
     if (msg.body === "6" && msg.from.endsWith("@c.us")) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
 
       const boletoPath = path.join(__dirname, "boleto.pdf");
       if (fs.existsSync(boletoPath)) {
@@ -133,9 +133,9 @@ function startBot() {
       msg.from.endsWith("@c.us")
     ) {
       const chat = await msg.getChat();
-      // await delay(3000);
+      await delay(3000);
       await chat.sendStateTyping();
-      // await delay(3000);
+      await delay(3000);
       await client.sendMessage(msg.from, 'Por favor, escolha uma das opções de 1 a 6. Caso precise, digite "Menu" para ver as opções novamente.');
     }
   });
