@@ -16,7 +16,7 @@ function startBot() {
 			headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		},
-    // authStrategy: new LocalAuth({ dataPath: `../../wwebjs_auth/` }),
+    authStrategy: new LocalAuth({ dataPath: `../../wwebjs_auth/` }),
   });
 
 	client.on("ready", async () => {
