@@ -26,9 +26,10 @@ async function createEvent(client, dataHora) {
     const oauth2Client = setClient();
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
     const businessEmail = process.env.BUSINESS_EMAIL;
+    const localtion = process.env.LOCATION;
     const evento = {
       summary: `Consulta Agendada - ${client.name}`,
-      location: 'Endereço ou link do meeting',
+      location: localtion,
       description: 'Agendamento via sistema automatizado',
       start: { dateTime: dataHora.inicio, timeZone: 'America/Sao_Paulo' },
       end: { dateTime: dataHora.fim, timeZone: 'America/Sao_Paulo' },
