@@ -61,7 +61,7 @@ async function createEvent(emailPrestador, clientEmail, dataHora) {
 }
 
 // Exemplo de chamada
-// createEvent('byteforge722@gmail.com', 'test@gmail.com', {
+// createEvent('test@gmail.com', 'client@gmail.com', {
 //   inicio: '2025-07-10T10:00:00-03:00',
 //   fim: '2025-07-10T11:00:00-03:00'
 // });
