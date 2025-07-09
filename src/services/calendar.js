@@ -19,7 +19,7 @@ function setClient() {
   return oauth2Client;
 }
 
-async function createEvent(clientEmail, dataHora) {
+async function createEvent(client, dataHora) {
   const funcTag = '[createEvent]';
   try {
     console.log(`${funcTag} Iniciando criação de evento no Google Calendar...`);
@@ -27,13 +27,13 @@ async function createEvent(clientEmail, dataHora) {
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
     const businessEmail = process.env.BUSINESS_EMAIL;
     const evento = {
-      summary: 'Consulta Agendada',
+      summary: `Consulta Agendada - ${client.name}`,
       location: 'Endereço ou link do meeting',
       description: 'Agendamento via sistema automatizado',
       start: { dateTime: dataHora.inicio, timeZone: 'America/Sao_Paulo' },
       end: { dateTime: dataHora.fim, timeZone: 'America/Sao_Paulo' },
       attendees: [
-        { email: clientEmail },
+        { email: client.email },
         { email: businessEmail }
       ],
       sendUpdates: 'all',
@@ -59,7 +59,10 @@ async function createEvent(clientEmail, dataHora) {
 }
 
 // Exemplo de chamada
-// createEvent('client@gmail.com', {
+// createEvent({
+//    name: 'Client',
+//    email: 'client@gmail.com',
+// }, {
 //   inicio: '2025-07-10T10:00:00-03:00',
 //   fim: '2025-07-10T11:00:00-03:00'
 // });
