@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { ApiResponse } = require('../models/apiResponse');
 
-dotenv.config(path.resolve(__dirname, '../../.env'));
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 function externalAccessAuth(req, res, next) {
     const funcTag = '[externalAccess]';
