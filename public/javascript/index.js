@@ -7,8 +7,8 @@ async function loadQrOnPage() {
     if (!response.ok) {
       throw new Error("Erro ao gerar QR Code");
     }
-    const data = await response.json();
-    qrDiv.innerHTML = `<img src="${data.qrUrl}" alt="QR Code" />`;
+    const resp = await response.json();
+    qrDiv.innerHTML = `<img src="${resp.data.qrUrl}" alt="QR Code" />`;
   } catch (error) {
     console.error("Erro ao carregar QR Code:", error);
     qrDiv.innerHTML = '<span style="color:red">Erro ao gerar QR Code</span>';
