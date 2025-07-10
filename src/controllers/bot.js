@@ -37,4 +37,4 @@ class BotController {
 }
 
 
-module.exports = { botController }
+module.exports = { BotController }
