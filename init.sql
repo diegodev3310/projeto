@@ -1,0 +1,9 @@
+CREAT SCHMA IF NOT EXISTS public AUTHORIZATION postgres;
+CREAT EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREAT TABLE IF NOT EXISTS mensgens_bot (
+    id UUID PRIMARY KEY DEFAULT uuid_gererate_v4(),
+    mensagem TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT_TIMESTAP,
+    updatedAt TIMESTAMP
+)
