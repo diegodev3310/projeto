@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS public AUTHORIZATION postgres;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS messages_bot (
-    id UUID PRIMARY KEY DEFAULT uuid_gererate_v4(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     message TEXT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP
