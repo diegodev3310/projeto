@@ -174,4 +174,9 @@ async function generateQr() {
   });
 }
 
-module.exports = { startBot, generateQr };
+function getClient() {
+  return client;
+}
+
+
+module.exports = { startBot, generateQr, getClient };

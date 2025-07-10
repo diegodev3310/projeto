@@ -1,4 +1,4 @@
-const { startBot, generateQr } = require('../services/bot');
+const { startBot, generateQr, getClient } = require('../services/bot');
 
 function router(express) {
   const router = express.Router();
@@ -26,6 +26,18 @@ function router(express) {
       res.status(500).send('Erro ao gerar QR Code.');
     }
   });
+
+router.get('/status', (req, res) => {
+  const client = getClient();
+
+  if (client) {
+    const state = client.info ? 'conectado' : 'iniciando';
+    res.status(200).json({ status: state });
+  } else {
+    res.status(200).json({ status: 'desconectado' });
+  }
+});
+
 
   return router;
 }
