@@ -1,18 +1,21 @@
-const startNewBtn = document.getElementById("start-new-session");
 const qrDiv = document.getElementById("qrcode");
 
-async function startNewSession() {
-  const resp = await fetch("/api/generate-qr")
-  .then(response => {
+async function loadQrOnPage() {
+  try {
+    const response = await fetch("/api/generate-qr");
     if (!response.ok) {
       throw new Error("Erro ao gerar QR Code");
     }
-    return response.json();
-  })
-  .catch(error => {
-    console.error("Erro ao iniciar nova sessão:", error);
-  });
-  qrDiv.innerHTML = `<img src="${resp.qrUrl}" alt="QR Code" />`;
+    const data = await response.json();
+    qrDiv.innerHTML = `<img src="${data.qrUrl}" alt="QR Code" />`;
+  } catch (error) {
+    console.error("Erro ao carregar QR Code:", error);
+    qrDiv.innerHTML = '<span style="color:red">Erro ao gerar QR Code</span>';
+  }
 }
 
-startNewBtn.addEventListener("click", startNewSession);
+// Atualiza o QR Code a cada 30 segundos
+window.addEventListener("DOMContentLoaded", () => {
+  loadQrOnPage();
+  setInterval(loadQrOnPage, 30000); // 30 segundos
+});
