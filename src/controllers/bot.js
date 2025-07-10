@@ -1,7 +1,7 @@
 const { generateQr, getClient } = require('../services/bot');
 const { ApiResponse } = require('../models/apiResponse');
 
-class botController {
+class BotController {
   constructor() {}
 
   async getQrCode(req, res) {
@@ -37,4 +37,4 @@ class botController {
 }
 
 
-module.exports = { botController }
+module.exports = { BotController }
