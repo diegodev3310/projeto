@@ -1,4 +1,5 @@
 const { BotController } = require('../controllers/bot');
+const { externalAccessAuth } = require('../middleware/externalAccessAuth');
 
 function router(express) {
   const router = express.Router();
