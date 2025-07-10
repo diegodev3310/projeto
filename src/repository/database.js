@@ -4,7 +4,7 @@ const path = require('path');
 
 dotenv.config(path.resolve(__dirname, '../../.env'));
 
-export default class Database {
+class Database {
     static #pool = null;
     static async #init() {
         const poolConfig = { max: process.env.PG_MAX || 3 };
@@ -15,9 +15,14 @@ export default class Database {
     }
 
     static async connect() {
+        const funcTag = '[Database.connect]';
+        console.log(`${funcTag} Conectando ao banco de dados...`);
         if (this.#pool == null) {
             this.#pool = await this.#init();
         }
+        console.log(`${funcTag} Conexão estabelecida com sucesso!`);
         return this.#pool;
     }
 }
+
+module.exports = { Database };
