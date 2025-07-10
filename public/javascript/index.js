@@ -1,4 +1,5 @@
 const qrDiv = document.getElementById("qrcode");
+const refreshButton = document.getElementById("refreshQr");
 
 async function loadQrOnPage() {
   try {
@@ -14,6 +15,9 @@ async function loadQrOnPage() {
   }
 }
 
+refreshButton.addEventListener("click", () => {
+  loadQrOnPage();
+});
 // Atualiza o QR Code a cada 30 segundos
 window.addEventListener("DOMContentLoaded", () => {
   loadQrOnPage();
