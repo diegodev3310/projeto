@@ -35,11 +35,11 @@ function startBot() {
 	});
 
   client.on("message", async msg => {
-    if (msg.body.match(/^[a-zA-Z0-9]+$/)) {
-      const chat = await msg.getChat();
-      await delay(3000);
-      await chat.sendStateTyping();
-      await delay(3000);
+    if (body.match(/(menu|Menu|Dia|Noite|Oi|Olá|Ola|Tarde)/i) && from.endsWith('@c.us')) {
+        const chat = await msg.getChat();
+        await delay(4000);
+        await chat.sendStateTyping();
+        await delay(4000);
       const contact = await msg.getContact();
       const name = contact.pushname || "usuário";
       await client.sendMessage(
