@@ -3,13 +3,13 @@ const { Database } = require('./database');
 class MessagesBotRepository {
   constructor() {}
   
-  async insert(message) {
+  async insert(messageReq) {
     const funcTag = '[MessagesBotRepository.insert]';
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Inserindo mensagem no DB`);
       const query = 'INSERT INTO messages_bot (message) VALUES ($1) RETURNING id, createdAt';
-      const values = [message];
+      const values = [messageReq.message];
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem inserida no DB`);
       return res.rows[0];
@@ -32,7 +32,10 @@ class MessagesBotRepository {
       console.error(`${funcTag} Erro ao recuperar mensagem:`, err);
       throw err;
     }
-  };
+  }
+
+  async update(messageReq) {}
+  async delete(messageReq) {}
 }
 
 module.exports = { MessagesBotRepository };
