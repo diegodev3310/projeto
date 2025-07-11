@@ -48,7 +48,11 @@ function startBot() {
   });
 
   client.on("message", async msg => {
-    if (msg.body.match(/^[a-zA-Z0-9]+$/)) {
+    // ✅ Checa se a mensagem é uma das palavras-chave
+    const texto = msg.body.trim().toLowerCase();
+    const palavrasAtivacao = ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "menu"];
+
+    if (palavrasAtivacao.includes(texto)) {
       const chat = await msg.getChat();
       await delay(3000);
       await chat.sendStateTyping();
