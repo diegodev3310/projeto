@@ -9,6 +9,7 @@ function router(express) {
   router.get('/generate-qr', botCtrl.getQrCode);
   router.get('/status', botCtrl.getClientStatus);
   
+  router.get('/messages', messagesBotCtrl.readAll)
   router.post('/messages', messagesBotCtrl.create);
 
   return router;
