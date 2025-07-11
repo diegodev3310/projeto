@@ -27,7 +27,20 @@ class MessagesBotService {
     }
   }
 
-  async readAll() {}
+  async readAll() {
+    const funcTag = "[MessagesBotService.readAll]"
+    try {
+      console.log(`${funcTag} Recuperando dados do repositorio`);
+      const result = await this.messagesBotRepository.getAll();
+      console.log(`${funcTag} Mensagens recuperadas no repositorio`);
+      const apiResponse = new ApiResponse(201, 'Mensagens recuperadas com sucesso', result);
+      return apiResponse;
+    } catch (error) {
+      console.error(`${funcTag} Erro ao recuperada mensagem:`, error);
+      throw error;
+    }
+  }
+
   async update(id, message) {}
   async delete(id) {}
 }
