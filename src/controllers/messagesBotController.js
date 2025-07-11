@@ -1,12 +1,19 @@
 const { MessagesBotService } = require('../services/messagesBotService');
+const { MessageRequest } = require('../models/messagesBot');
 
 class MesssageBotController {
+   constructor() {
+    this.messagesBotService = new MessagesBotService();
+    this.create = this.create.bind(this);
+    this.readAll = this.readAll.bind(this);
+  }
+
   async create(req, res) {
     const funcTag = '[MesssageBotController.create]';
     try {
-      const messagesBotService = new MessagesBotService();
       console.log(`${funcTag} Iniciando criação de mensagem...`);
-      const result = await messagesBotService.create(req.body);
+      const msgRequest = new MessageRequest(null, req.body.message)
+      const result = await this.messagesBotService.create(msgRequest);
       console.log(`${funcTag} Mensagem criada com sucesso:`, result);
       res.status(result.status).json(result);
     } catch (error) {
@@ -18,10 +25,9 @@ class MesssageBotController {
   async readAll(req, res) {
     const funcTag = '[MesssageBotController.readAll]';
     try {
-      const messagesBotService = new MessagesBotService();
       console.log(`${funcTag} Iniciando recuperação de mensagens...`);
-      const result = await messagesBotService.readAll();
-      console.log(`${funcTag} Mensagem recuperadas com sucesso:`, result);
+      const result = await this.messagesBotService.readAll();
+      console.log(`${funcTag} Mensagem recuperadas com sucesso`);
       res.status(result.status).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao recuperar mensagem:`, error);
