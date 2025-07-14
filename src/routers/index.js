@@ -1,15 +1,13 @@
-const { BotController } = require('../controllers/bot');
-const { MesssageBotController } = require('../controllers/messagesBotController');
+const { MessageBotController } = require('../controllers/messagesBotController');
 
 function router(express) {
   const router = express.Router();
-  const botCtrl = new BotController();
-  const messagesBotCtrl = new MesssageBotController();
+  const messagesBotCtrl = new MessageBotController();
 
-  router.get('/generate-qr', botCtrl.getQrCode);
-  router.get('/status', botCtrl.getClientStatus);
-  
-  router.post('/messages', messagesBotCtrl.create);
+  router.get('/messages', (req, res) => messagesBotCtrl.readAll(req, res));
+  router.post('/messages', (req, res) => messagesBotCtrl.create(req, res));
+  router.put('/messages/:id', (req, res) => messagesBotCtrl.update(req, res));
+  router.delete('/messages/:id', (req, res) => messagesBotCtrl.delete(req, res));
 
   return router;
 }

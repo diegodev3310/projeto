@@ -9,27 +9,41 @@ class MessagesBotService {
 
   async create(req) {
     const funcTag = "[MessagesBotService.create]";
-    try {
-      console.log(`${funcTag} Verificando dados recebidos`);
-      if (!req.message) {
-        console.error(`${funcTag} Mensagem inválida:`, req);
-        throw new Error('Mensagem inválida');
-      }
-      console.log(`${funcTag} Enviando dados para o repositorio`);
-      const messageRequest = new MessageRequest(req.message);
-      const result = await this.messagesBotRepository.insert(messageRequest.message);
-      console.log(`${funcTag} Mensagem criada no repositorio`);
-      const apiResponse = new ApiResponse(201, 'Mensagem criada com sucesso', result);
-      return apiResponse;
-    } catch (error) {
-      console.error(`${funcTag} Erro ao criar mensagem:`, error);
-      throw error;
+    if (!req.message) {
+      throw new Error("Mensagem inválida");
     }
+    const messageRequest = new MessageRequest(req.message);
+    const result = await this.messagesBotRepository.insert(messageRequest.message);
+    return new ApiResponse(201, 'Mensagem criada com sucesso', result);
   }
 
-  async readAll() {}
-  async update(id, message) {}
-  async delete(id) {}
+  async readAll() {
+    const result = await this.messagesBotRepository.findAll();
+    return new ApiResponse(200, 'Mensagens encontradas', result);
+  }
+
+  async update(id, body) {
+    const funcTag = "[MessagesBotService.update]";
+    if (!body.message) {
+      throw new Error("Mensagem inválida para atualização");
+    }
+
+    const result = await this.messagesBotRepository.update(id, body.message);
+    if (!result) {
+      throw new Error("Mensagem não encontrada para atualização");
+    }
+
+    return new ApiResponse(200, 'Mensagem atualizada com sucesso', result);
+  }
+
+  async delete(id) {
+    const funcTag = "[MessagesBotService.delete]";
+    const result = await this.messagesBotRepository.deleteById(id);
+    if (!result) {
+      throw new Error("Mensagem não encontrada para exclusão");
+    }
+    return new ApiResponse(200, 'Mensagem deletada com sucesso', result);
+  }
 }
 
 module.exports = { MessagesBotService };

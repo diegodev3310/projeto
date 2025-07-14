@@ -1,22 +1,38 @@
 const { Database } = require('./database');
 
 class MessagesBotRepository {
-  constructor() {}
-  
   async insert(message) {
-    const funcTag = '[insert]';
-    try {
-      const db = await Database.connect();
-      console.log(`${funcTag} Inserindo mensagem no DB`);
-      const query = 'INSERT INTO messages_bot (message) VALUES ($1) RETURNING id, createdAt';
-      const values = [message];
-      const res = await db.query(query, values);
-      console.log(`${funcTag} Mensagem inserida no DB`);
-      return res.rows[0];
-    } catch (err) {
-      console.error(`${funcTag} Erro ao inserir mensagem:`, err);
-      throw err;
-    }
+    const pool = await Database.connect();
+    const query = 'INSERT INTO messages_bot (message) VALUES ($1) RETURNING *';
+    const values = [message];
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  }
+
+  async findAll() {
+    const pool = await Database.connect();
+    const result = await pool.query('SELECT * FROM messages_bot ORDER BY createdAt DESC');
+    return result.rows;
+  }
+
+  async update(id, message) {
+    const pool = await Database.connect();
+    const query = `
+      UPDATE messages_bot
+      SET message = $1, updatedAt = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *;
+    `;
+    const values = [message, id];
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  }
+
+  async deleteById(id) {
+    const pool = await Database.connect();
+    const query = 'DELETE FROM messages_bot WHERE id = $1 RETURNING *';
+    const result = await pool.query(query, [id]);
+    return result.rows[0]; // retorna null se não encontrar
   }
 }
 
