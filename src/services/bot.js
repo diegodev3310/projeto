@@ -101,9 +101,12 @@ async function startBot() {
       await chat.sendStateTyping();
       await delay(3000);
       // Primeira mensagem do menu (action: 'menu', idx: '1')
+      const contact = await msg.getContact();
+      const name = contact.pushname ? contact.pushname.split(' ')[0] : 'usuário';
       const menuMsg = botMsgs.data.find(m => m.action === "menu");
       if (menuMsg) {
-        await client.sendMessage(msg.from, menuMsg.message);
+        const personalizedMsg = menuMsg.message.replace('${name}', name);
+        await client.sendMessage(msg.from, personalizedMsg);
       }
       await chat.sendStateTyping();
       await delay(3000);  
