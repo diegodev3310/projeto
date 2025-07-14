@@ -12,7 +12,7 @@ class MesssageBotController {
     const funcTag = '[MesssageBotController.create]';
     try {
       console.log(`${funcTag} Iniciando criação de mensagem...`);
-      const msgRequest = new MessageRequest(null, req.body.message)
+      const msgRequest = new MessageRequest(null, req.body.message, req.body.action);
       const result = await this.messagesBotService.create(msgRequest);
       console.log(`${funcTag} Mensagem criada com sucesso:`, result);
       res.status(result.status).json(result);
