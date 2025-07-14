@@ -7,7 +7,7 @@ class MessagesBotService {
     this.messagesBotRepository = new MessagesBotRepository();
   }
 
-  async create(messageReq) {
+  async create(req) {
     const funcTag = "[MessagesBotService.create]";
     if (!req.message) {
       throw new Error("Mensagem inválida");

@@ -20,15 +20,15 @@ class Database {
         return pool;
     }
 
-  static async connect() {
-    const funcTag = '[Database.connect]';
-    console.log(`${funcTag} Conectando ao banco de dados...`);
-    if (this.#pool == null) {
-        this.#pool = await this.#init();
+    static async connect() {
+        const funcTag = '[Database.connect]';
+        console.log(`${funcTag} Conectando ao banco de dados...`);
+        if (this.#pool == null) {
+            this.#pool = await this.#init();
+        }
+        console.log(`${funcTag} Conexão estabelecida com sucesso!`);
+        return this.#pool;
     }
-    console.log(`${funcTag} Conexão estabelecida com sucesso!`);
-    return this.#pool;
-  }
 }
 
 module.exports = { Database };

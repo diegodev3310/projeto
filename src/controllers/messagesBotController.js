@@ -1,13 +1,12 @@
 const { MessagesBotService } = require('../services/messagesBotService');
-const { MessageRequest } = require('../models/messagesBot');
 
 class MessageBotController {
   async create(req, res) {
     const funcTag = '[MessageBotController.create]';
     try {
+      const messagesBotService = new MessagesBotService();
       console.log(`${funcTag} Iniciando criação de mensagem...`);
-      const msgRequest = new MessageRequest(null, req.body.message)
-      const result = await this.messagesBotService.create(msgRequest);
+      const result = await messagesBotService.create(req.body);
       console.log(`${funcTag} Mensagem criada com sucesso:`, result);
       res.status(result.status || 201).json(result);
     } catch (error) {

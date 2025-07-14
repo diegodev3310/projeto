@@ -1,6 +1,5 @@
 class MessageRequest {
-  constructor(id = null, message = null) {
-    this.id = id;
+  constructor(message = '') {
     this.message = message;
   }
 }

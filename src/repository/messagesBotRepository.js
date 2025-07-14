@@ -34,24 +34,6 @@ class MessagesBotRepository {
     const result = await pool.query(query, [id]);
     return result.rows[0]; // retorna null se não encontrar
   }
-
-  async getAll() {
-    const funcTag = '[MessagesBotRepository.getAll]';
-    try {
-      const db = await Database.connect();
-      console.log(`${funcTag} Recuperando mensagens no DB`);
-      const query = 'select message, ROW_NUMBER() OVER (ORDER BY createdAt) as index from messages_bot;';
-      const res = await db.query(query);
-      console.log(`${funcTag} Mensagens recuperadas no DB`);
-      return res.rows;
-    } catch (err) {
-      console.error(`${funcTag} Erro ao recuperar mensagem:`, err);
-      throw err;
-    }
-  }
-
-  async update(messageReq) {}
-  async delete(messageReq) {}
 }
 
 module.exports = { MessagesBotRepository };

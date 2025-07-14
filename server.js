@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const { startBot } = require('./src/services/bot');
 const { router } = require('./src/routers/index');
-const { securityMiddleware } = require('./src/middleware/securitySanitize');
 
 dotenv.config();
 const port = process.env.NODE_PORT;
@@ -11,7 +10,6 @@ const port = process.env.NODE_PORT;
 // Configurando o middleware para processar dados de formulários e JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(securityMiddleware());
 
 // Importando as rotas
 app.use('/api', router(express));

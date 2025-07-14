@@ -6,46 +6,33 @@ const path = require("path");
 const delay = ms => new Promise(res => setTimeout(res, ms));
 let client = null;
 let lastQrUrl = null;
-let status = 'desconectado'; // ✅ Status global
 
 function startBot() {
-  const funcTag = "[startBot]";
-  console.log(`${funcTag} Iniciando Client...`);
-
-  status = 'iniciando'; // ✅ Atualiza status
+	const funcTag = "[startBot]";
+	console.log(`${funcTag} Iniciando Client...`);
 
   client = new Client({
-    puppeteer: {
-      headless: true,
+		puppeteer: {
+			headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    },
+		},
     authStrategy: new LocalAuth({ dataPath: `../../wwebjs_auth/` }),
   });
 
-  // Dispara quando QR gerado
-  client.on("qr", qr => {
-    status = 'aguardando_qr'; // ✅ Atualiza status
-    console.log(`${funcTag} Status agora: ${status}`);
-    qrcodeImage.toDataURL(qr, (err, url) => {
-      if (!err) {
-        console.log(`${funcTag} QR Code generated`);
-        lastQrUrl = url;
-      }
-    });
+	client.on("ready", async () => {
+    console.log(`${funcTag} BOT_READY`);
+    const info = await client.info;
+    console.log(`{funcTag} CLIENT_INFO:${JSON.stringify(info)}`);
   });
 
-  // Dispara quando pronto/conectado
-  client.on("ready", () => {
-    status = 'conectado'; // ✅ Atualiza status
-    console.log(`${funcTag} BOT_READY, status agora: ${status}`);
-    const info = client.info;
-    console.log(`${funcTag} CLIENT_INFO: ${JSON.stringify(info)}`);
-  });
-
-  client.on("disconnected", (reason) => {
-    status = 'desconectado'; // ✅ Atualiza status
-    console.log(`${funcTag} BOT_DISCONNECTED. Motivo: ${reason}`);
-  });
+	client.on("qr", qr => {
+		qrcodeImage.toDataURL(qr, (err, url) => {
+			if (!err) {
+				console.log(`${funcTag} QR Code generated`);
+				lastQrUrl = url;
+			}
+		});
+	});
 
   client.on("message", async msg => {
     if (msg.body.match(/^[a-zA-Z0-9]+$/)) {
@@ -139,6 +126,7 @@ function startBot() {
       }
     }
 
+    // Se enviar números inválidos
     if (
       msg.body !== null &&
       /^[1-9]\d*$/.test(msg.body) &&
@@ -153,12 +141,12 @@ function startBot() {
     }
   });
 
-  console.log(`${funcTag} Initialize bot...`);
+	console.log(`${funcTag} Initialize bot...`);
   client.initialize();
 }
 
 async function generateQr() {
-  if (lastQrUrl) {
+	if (lastQrUrl) {
     return lastQrUrl;
   }
 
@@ -190,8 +178,5 @@ function getClient() {
   return client;
 }
 
-function getStatus() {
-  return status; // ✅
-}
 
-module.exports = { startBot, generateQr, getClient, getStatus };
+module.exports = { startBot, generateQr, getClient };
