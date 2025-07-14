@@ -8,8 +8,13 @@ class MessagesBotRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Inserindo mensagem no DB`);
-      const query = 'INSERT INTO messages_bot (message) VALUES ($1) RETURNING id, createdAt';
-      const values = [messageReq.message];
+      
+      const query = `
+      INSERT INTO messages_bot(message, action) 
+      VALUES ($1,
+        (SELECT id FROM messages_actions WHERE action = $2)
+      )RETURNING id, createdAt;`;
+      const values = [messageReq.message, messageReq.action];
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem inserida no DB`);
       return res.rows[0];
@@ -24,7 +29,17 @@ class MessagesBotRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Recuperando mensagens no DB`);
-      const query = 'select message, ROW_NUMBER() OVER (ORDER BY createdAt) as index from messages_bot;';
+      const query = `
+      SELECT
+        mb.message,
+        ma.action,
+        ROW_NUMBER() OVER (PARTITION BY mb.action ORDER BY mb.createdAt) AS idx
+      FROM
+        messages_bot mb
+      LEFT JOIN
+        messages_actions ma ON mb.action = ma.id
+      ORDER BY
+        ma.action, idx;`;
       const res = await db.query(query);
       console.log(`${funcTag} Mensagens recuperadas no DB`);
       return res.rows;
