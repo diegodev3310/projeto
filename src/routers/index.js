@@ -10,7 +10,7 @@ function router(express) {
   router.get('/generate-qr', botCtrl.getQrCode);
   router.get('/status', botCtrl.getClientStatus);
   
-  router.get('/messages', externalAccessAuth, messagesBotCtrl.readAll.bind(messagesBotCtrl));
+  router.get('/messages', messagesBotCtrl.readAll.bind(messagesBotCtrl));
   router.post('/messages', externalAccessAuth, messagesBotCtrl.create.bind(messagesBotCtrl));
 
   return router;
