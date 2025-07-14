@@ -28,7 +28,7 @@ class MessagesBotService {
       console.log(`${funcTag} Recuperando dados do repositorio`);
       const result = await this.messagesBotRepository.getAll();
       console.log(`${funcTag} Mensagens recuperadas no repositorio`);
-      const apiResponse = new ApiResponse(201, 'Mensagens recuperadas com sucesso', result);
+      const apiResponse = new ApiResponse(201, 'Mensagens recuperadas com sucesso', formatReadAll(result));
       return apiResponse;
     } catch (error) {
       console.error(`${funcTag} Erro ao recuperada mensagem:`, error);
@@ -38,6 +38,18 @@ class MessagesBotService {
 
   async update(id, message) {}
   async delete(id) {}
+}
+
+function formatReadAll(result){
+  // Separa os grupos
+  const nullOnes = result.filter(row => row.action === null);
+  const notNulls = result.filter(row => row.action === 'mark_unread' || row.action === 'send_boleto');
+  const menus = result.filter(row => row.action === 'menu');
+  // Reindexa idx para cada grupo
+  const nullOnesForm = nullOnes.map((row, i) => ({ message: row.message, action: null, idx: i + 1 }));
+  const notNullsForm = notNulls.map((row, i) => ({ message: row.message, action: row.action, idx: nullOnesForm.length + i + 1 }));
+  const menusForm = menus.map((row, i) => ({ message: row.message, action: 'menu', idx: i + 1 }));
+  return [...nullOnesForm, ...notNullsForm, ...menusForm];
 }
 
 function validadeMsg(messageReq){
