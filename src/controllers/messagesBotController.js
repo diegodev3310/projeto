@@ -1,5 +1,6 @@
 const { MessagesBotService } = require('../services/messagesBotService');
 const { MessageRequest } = require('../models/messagesBot');
+const { getBotMessages } = require('../services/bot');
 
 class MesssageBotController {
    constructor() {
@@ -15,6 +16,7 @@ class MesssageBotController {
       const msgRequest = new MessageRequest(null, req.body.message, req.body.action);
       const result = await this.messagesBotService.create(msgRequest);
       console.log(`${funcTag} Mensagem criada com sucesso:`, result);
+      getBotMessages();
       res.status(result.status).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao criar mensagem:`, error);

@@ -4,24 +4,19 @@ const dotenv = require('dotenv');
 const qrcodeImage = require("qrcode");
 const { Client, MessageMedia, LocalAuth } = require("whatsapp-web.js");
 const { MessagesBotService } = require('../services/messagesBotService');
+const { get } = require("http");
 
 dotenv.config(path.resolve(__dirname, '../../.env'));
 const delay = ms => new Promise(res => setTimeout(res, ms));
 let client = null;
 let lastQrUrl = null;
 let status = 'desconectado'; // ✅ Status global
+let botMsgs = null;
 
 async function startBot() {
   const funcTag = "[startBot]";
   console.log(`${funcTag} Iniciando Client...`);
-  const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/messages`
-  const botMsgs = await fetch(url)
-  .then(async resp => {
-    const json = await resp.json();
-    return json;
-  }).catch(
-    console.log(`${funcTag} Erro recuperando mensagens`)
-  );
+  getBotMessages();
 
   status = 'iniciando'; // ✅ Atualiza status
   client = new Client({
@@ -155,4 +150,23 @@ function getStatus() {
   return status; // ✅
 }
 
-module.exports = { startBot, generateQr, getClient, getStatus };
+async function getBotMessages() {
+  const funcTag = '[getBotMessages]';
+  try {
+    const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/messages`
+    console.log(`${funcTag} Atualizando mensagens do bot`);
+    botMsgs = await fetch(url)
+    .then(async resp => {
+      const json = await resp.json();
+      return json;
+    }).catch(
+      console.log(`${funcTag} Erro recuperando mensagens`)
+    );
+    console.log(`${funcTag} Mensagens do bot atualizadas com sucesso`);
+  } catch (error) {
+    console.log(`${funcTag} Erro ao buscar mensagens do bot:`, error);
+    throw error;
+  }
+} 
+
+module.exports = { startBot, generateQr, getClient, getStatus, getBotMessages };
