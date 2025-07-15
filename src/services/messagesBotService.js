@@ -9,40 +9,65 @@ class MessagesBotService {
 
   async create(messageReq) {
     const funcTag = "[MessagesBotService.create]";
-    if (!req.message) {
-      throw new Error("Mensagem inválida");
+    try {
+      validateMsg(messageReq);
+      console.log(`${funcTag} Enviando dados para o repositório...`);
+      const result = await this.messagesBotRepository.insert(messageReq);
+      console.log(`${funcTag} Mensagem criada com sucesso`);
+      return new ApiResponse(201, 'Mensagem criada com sucesso', result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao criar mensagem:`, error);
+      throw error;
     }
-    const messageRequest = new MessageRequest(req.message);
-    const result = await this.messagesBotRepository.insert(messageRequest.message);
-    return new ApiResponse(201, 'Mensagem criada com sucesso', result);
   }
 
   async readAll() {
-    const result = await this.messagesBotRepository.findAll();
-    return new ApiResponse(200, 'Mensagens encontradas', result);
+    const funcTag = "[MessagesBotService.readAll]";
+    try {
+      console.log(`${funcTag} Recuperando mensagens do repositório...`);
+      const result = await this.messagesBotRepository.getAll();
+      console.log(`${funcTag} Mensagens recuperadas com sucesso`);
+      return new ApiResponse(200, 'Mensagens recuperadas com sucesso', result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao recuperar mensagens:`, error);
+      throw error;
+    }
   }
 
-  async update(id, body) {
+  async update(id, messageReq) {
     const funcTag = "[MessagesBotService.update]";
-    if (!body.message) {
-      throw new Error("Mensagem inválida para atualização");
+    try {
+      validateMsg(messageReq);
+      console.log(`${funcTag} Atualizando mensagem com ID: ${id}`);
+      const result = await this.messagesBotRepository.update(messageReq);
+      console.log(`${funcTag} Mensagem atualizada com sucesso`);
+      return new ApiResponse(200, 'Mensagem atualizada com sucesso', result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao atualizar mensagem:`, error);
+      throw error;
     }
-
-    const result = await this.messagesBotRepository.update(id, body.message);
-    if (!result) {
-      throw new Error("Mensagem não encontrada para atualização");
-    }
-
-    return new ApiResponse(200, 'Mensagem atualizada com sucesso', result);
   }
 
   async delete(id) {
     const funcTag = "[MessagesBotService.delete]";
-    const result = await this.messagesBotRepository.deleteById(id);
-    if (!result) {
-      throw new Error("Mensagem não encontrada para exclusão");
+    try {
+      console.log(`${funcTag} Deletando mensagem com ID: ${id}`);
+      const result = await this.messagesBotRepository.delete(id);
+      console.log(`${funcTag} Mensagem deletada com sucesso`);
+      return new ApiResponse(200, 'Mensagem deletada com sucesso', result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao deletar mensagem:`, error);
+      throw error;
     }
-    return new ApiResponse(200, 'Mensagem deletada com sucesso', result);
+  }
+}
+
+function validateMsg(messageReq) {
+  const funcTag = '[validateMsg]';
+  console.log(`${funcTag} Validando mensagem...`);
+  if (!messageReq.message) {
+    console.error(`${funcTag} Mensagem inválida:`, messageReq);
+    throw new Error('Mensagem requerida');
   }
 }
 
