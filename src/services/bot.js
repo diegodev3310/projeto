@@ -3,8 +3,6 @@ const path = require("path");
 const dotenv = require('dotenv');
 const qrcodeImage = require("qrcode");
 const { Client, MessageMedia, LocalAuth } = require("whatsapp-web.js");
-const { MessagesBotService } = require('../services/messagesBotService');
-const { get } = require("http");
 
 dotenv.config(path.resolve(__dirname, '../../.env'));
 const delay = ms => new Promise(res => setTimeout(res, ms));
