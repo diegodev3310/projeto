@@ -1,17 +1,19 @@
 const { BotController } = require('../controllers/bot');
-const { MesssageBotController } = require('../controllers/messagesBotController');
+const { MessageBotController } = require('../controllers/messagesBotController');
 const { externalAccessAuth } = require('../middleware/externalAccessAuth');
 
 function router(express) {
   const router = express.Router();
   const botCtrl = new BotController();
-  const messagesBotCtrl = new MesssageBotController();
+  const messagesBotCtrl = new MessageBotController();
 
-  router.get('/generate-qr', botCtrl.getQrCode);
-  router.get('/status', botCtrl.getClientStatus);
-  
+  router.get('/generate-qr', botCtrl.getQrCode.bind(botCtrl));
+  router.get('/status', botCtrl.getClientStatus.bind(botCtrl));
+
   router.get('/messages', messagesBotCtrl.readAll.bind(messagesBotCtrl));
   router.post('/messages', externalAccessAuth, messagesBotCtrl.create.bind(messagesBotCtrl));
+  router.put('/messages/:id', externalAccessAuth, messagesBotCtrl.update.bind(messagesBotCtrl));
+  router.delete('/messages/:id', externalAccessAuth, messagesBotCtrl.delete.bind(messagesBotCtrl));
 
   return router;
 }

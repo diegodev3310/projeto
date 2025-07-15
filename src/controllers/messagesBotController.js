@@ -2,22 +2,20 @@ const { MessagesBotService } = require('../services/messagesBotService');
 const { MessageRequest } = require('../models/messagesBot');
 const { getBotMessages } = require('../services/bot');
 
-class MesssageBotController {
-   constructor() {
+class MessageBotController {
+  constructor() {
     this.messagesBotService = new MessagesBotService();
-    this.create = this.create.bind(this);
-    this.readAll = this.readAll.bind(this);
   }
 
   async create(req, res) {
-    const funcTag = '[MesssageBotController.create]';
+    const funcTag = '[MessageBotController.create]';
     try {
       console.log(`${funcTag} Iniciando criação de mensagem...`);
       const msgRequest = new MessageRequest(null, req.body.message, req.body.action);
       const result = await this.messagesBotService.create(msgRequest);
-      console.log(`${funcTag} Mensagem criada com sucesso:`, result);
+      console.log(`${funcTag} Mensagem criada com sucesso`);
       getBotMessages();
-      res.status(result.status).json(result);
+      res.status(result.status || 201).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao criar mensagem:`, error);
       res.status(500).json({ error: 'Erro ao criar mensagem' });
@@ -25,23 +23,49 @@ class MesssageBotController {
   }
 
   async readAll(req, res) {
-    const funcTag = '[MesssageBotController.readAll]';
+    const funcTag = '[MessageBotController.readAll]';
     try {
-      console.log(`${funcTag} Iniciando recuperação de mensagens...`);
+      console.log(`${funcTag} Buscando todas as mensagens...`);
       const result = await this.messagesBotService.readAll();
-      console.log(`${funcTag} Mensagem recuperadas com sucesso`);
-      res.status(result.status).json(result);
+      console.log(`${funcTag} Mensagens encontradas`);
+      res.status(result.status || 200).json(result);
     } catch (error) {
-      console.error(`${funcTag} Erro ao recuperar mensagem:`, error);
-      res.status(500).json({ error: 'Erro ao recuperar mensagem' });
+      console.error(`${funcTag} Erro ao buscar mensagens:`, error);
+      res.status(500).json({ error: 'Erro ao buscar mensagens' });
     }
   }
 
   async update(req, res) {
+    const funcTag = '[MessageBotController.update]';
+    try {
+      const { id } = req.params;
+      console.log(`${funcTag} Atualizando mensagem com ID: ${id}`);
+      console.log(`${funcTag} Dados recebidos:`, req.body);
+      const msgRequest = new MessageRequest(id, req.body.message, req.body.action);
+      const result = await this.messagesBotService.update(msgRequest);
+      console.log(`${funcTag} Mensagem atualizada com sucesso`);
+      getBotMessages();
+      res.status(result.status || 200).json(result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao atualizar mensagem:`, error);
+      res.status(500).json({ error: 'Erro ao atualizar mensagem' });
+    }
   }
 
   async delete(req, res) {
+    const funcTag = '[MessageBotController.delete]';
+    try {
+      const { id } = req.params;
+      console.log(`${funcTag} Deletando mensagem com ID: ${id}`);
+      const result = await this.messagesBotService.delete(id);
+      console.log(`${funcTag} Mensagem deletada com sucesso`);
+      getBotMessages();
+      res.status(result.status || 200).json(result);
+    } catch (error) {
+      console.error(`${funcTag} Erro ao deletar mensagem:`, error);
+      res.status(500).json({ error: 'Erro ao deletar mensagem' });
+    }
   }
 }
 
-module.exports = { MesssageBotController };
+module.exports = { MessageBotController };
