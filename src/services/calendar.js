@@ -19,7 +19,7 @@ function setClient() {
   return oauth2Client;
 }
 
-async function createEvent(client, dataHora) {
+async function createEvent(client) {
   const funcTag = '[createEvent]';
   try {
     console.log(`${funcTag} Iniciando criação de evento no Google Calendar...`);
@@ -30,9 +30,9 @@ async function createEvent(client, dataHora) {
     const evento = {
       summary: `Consulta Agendada - ${client.name}`,
       location: localtion,
-      description: 'Agendamento via sistema automatizado',
-      start: { dateTime: dataHora.inicio, timeZone: 'America/Sao_Paulo' },
-      end: { dateTime: dataHora.fim, timeZone: 'America/Sao_Paulo' },
+      description: `Agendamento via sistema automatizado \n Cliente: ${client.name} \n Especialidade: ${client.specialty} \n Convênio: ${client.convenio}`,
+      start: { dateTime: client.dateInit, timeZone: 'America/Sao_Paulo' },
+      end: { dateTime: client.dateEnd, timeZone: 'America/Sao_Paulo' },
       attendees: [
         { email: client.email },
         { email: businessEmail }
@@ -53,18 +53,21 @@ async function createEvent(client, dataHora) {
       resource: evento
     });
     console.log(`${funcTag} Evento criado`);
-    return res.data.htmlLink;
+    return true;
   } catch (err) {
     console.error(`${funcTag} Erro ao criar evento:`, err);
+    return false;
   }
 }
 
-// Exemplo de chamada
-// createEvent({
-//    name: 'Client',
-//    email: 'client@gmail.com',
-// }, {
-//   inicio: '2025-07-10T10:00:00-03:00',
-//   fim: '2025-07-10T11:00:00-03:00'
-// });
+/* Exemplo de chamada
+createEvent({
+  name: 'Client',
+  specialty: 'Cardiologia',
+  convenio: 'Unimed',
+  email: 'client@gmail.com',
+  dateInit: '2025-07-10T10:00:00-03:00',
+  dateEnd: '2025-07-10T11:00:00-03:00'
+});
+*/
 module.exports = { createEvent };
