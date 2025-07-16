@@ -7,9 +7,14 @@ class MessagesBotRepository {
     const funcTag = '[MessagesBotRepository.insert]';
     try {
       const db = await Database.connect();
-      console.log(`${funcTag} Inserindo mensagem no DB...`);
-      const query = 'INSERT INTO messages_bot (message) VALUES ($1) RETURNING id, createdAt';
-      const values = [messageReq.message];
+      console.log(`${funcTag} Inserindo mensagem no DB`);
+      
+      const query = `
+      INSERT INTO messages_bot(message, action) 
+      VALUES ($1,
+        (SELECT id FROM messages_actions WHERE action = $2)
+      )RETURNING id, createdAt;`;
+      const values = [messageReq.message, messageReq.action];
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem inserida com sucesso`);
       return res.rows[0];
@@ -23,8 +28,19 @@ class MessagesBotRepository {
     const funcTag = '[MessagesBotRepository.getAll]';
     try {
       const db = await Database.connect();
-      console.log(`${funcTag} Recuperando mensagens do DB...`);
-      const query = 'SELECT id, message, createdAt FROM messages_bot ORDER BY createdAt DESC';
+      console.log(`${funcTag} Recuperando mensagens no DB`);
+      const query = `
+      SELECT
+        mb.id,
+        mb.message,
+        ma.action,
+        ROW_NUMBER() OVER (PARTITION BY mb.action ORDER BY mb.createdAt) AS idx
+      FROM
+        messages_bot mb
+      LEFT JOIN
+        messages_actions ma ON mb.action = ma.id
+      ORDER BY
+        ma.action, idx;`;
       const res = await db.query(query);
       console.log(`${funcTag} Mensagens recuperadas`);
       return res.rows;
@@ -39,8 +55,11 @@ class MessagesBotRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Atualizando mensagem com ID: ${messageReq.id}`);
-      const query = 'UPDATE messages_bot SET message = $1, updatedAt = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, message, updatedAt';
+      let query = 'UPDATE messages_bot SET message = $1, updatedAt = CURRENT_TIMESTAMP ';
+      messageReq.action ? query += ', action = (SELECT id FROM messages_actions WHERE action = $3)' : '';
+      query += 'WHERE id = $2 RETURNING id, updatedAt'
       const values = [messageReq.message, messageReq.id];
+      if (messageReq.action) { values.push(messageReq.action); }
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem atualizada`);
       return res.rows[0];

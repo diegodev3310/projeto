@@ -1,7 +1,8 @@
 class MessageRequest {
-  constructor(id = null, message = null) {
+  constructor(id = null, message = null, action = null) {
     this.id = id;
     this.message = message;
+    this.action = action;
   }
 }
 

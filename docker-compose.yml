@@ -9,6 +9,8 @@ services:
       - .env
     networks:
       - chatbot_network
+    volumes:
+      - ./.wwebjs_auth:/app/.wwebjs_auth
     ports:
       - "${NODE_PORT}:${NODE_PORT}"
     healthcheck:

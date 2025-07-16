@@ -26,19 +26,20 @@ class MessagesBotService {
     try {
       console.log(`${funcTag} Recuperando mensagens do repositório...`);
       const result = await this.messagesBotRepository.getAll();
-      console.log(`${funcTag} Mensagens recuperadas com sucesso`);
-      return new ApiResponse(200, 'Mensagens recuperadas com sucesso', result);
+      console.log(`${funcTag} Mensagens recuperadas no repositorio`);
+      const apiResponse = new ApiResponse(201, 'Mensagens recuperadas com sucesso', formatReadAll(result));
+      return apiResponse;
     } catch (error) {
       console.error(`${funcTag} Erro ao recuperar mensagens:`, error);
       throw error;
     }
   }
 
-  async update(id, messageReq) {
+  async update(messageReq) {
     const funcTag = "[MessagesBotService.update]";
     try {
       validateMsg(messageReq);
-      console.log(`${funcTag} Atualizando mensagem com ID: ${id}`);
+      console.log(`${funcTag} Atualizando mensagem com ID: ${messageReq.id}`);
       const result = await this.messagesBotRepository.update(messageReq);
       console.log(`${funcTag} Mensagem atualizada com sucesso`);
       return new ApiResponse(200, 'Mensagem atualizada com sucesso', result);
@@ -60,6 +61,18 @@ class MessagesBotService {
       throw error;
     }
   }
+}
+
+function formatReadAll(result){
+  // Separa os grupos
+  const nullOnes = result.filter(row => row.action === null);
+  const notNulls = result.filter(row => row.action === 'mark_unread' || row.action === 'send_boleto');
+  const menus = result.filter(row => row.action === 'menu');
+  // Reindexa idx para cada grupo
+  const nullOnesForm = nullOnes.map((row, i) => ({ id: row.id, message: row.message, action: null, idx: i + 1 }));
+  const notNullsForm = notNulls.map((row, i) => ({ id: row.id, message: row.message, action: row.action, idx: nullOnesForm.length + i + 1 }));
+  const menusForm = menus.map((row, i) => ({ id: row.id, message: row.message, action: 'menu', idx: i + 1 }));
+  return [...nullOnesForm, ...notNullsForm, ...menusForm];
 }
 
 function validateMsg(messageReq) {

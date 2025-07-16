@@ -11,9 +11,9 @@ function router(express) {
   router.get('/status', botCtrl.getClientStatus.bind(botCtrl));
 
   router.get('/messages', messagesBotCtrl.readAll.bind(messagesBotCtrl));
-  router.post('/messages', messagesBotCtrl.create.bind(messagesBotCtrl));
-  router.put('/messages/:id', messagesBotCtrl.update.bind(messagesBotCtrl));
-  router.delete('/messages/:id', messagesBotCtrl.delete.bind(messagesBotCtrl));
+  router.post('/messages', externalAccessAuth, messagesBotCtrl.create.bind(messagesBotCtrl));
+  router.put('/messages/:id', externalAccessAuth, messagesBotCtrl.update.bind(messagesBotCtrl));
+  router.delete('/messages/:id', externalAccessAuth, messagesBotCtrl.delete.bind(messagesBotCtrl));
 
   return router;
 }

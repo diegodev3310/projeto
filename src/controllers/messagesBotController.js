@@ -1,5 +1,6 @@
 const { MessagesBotService } = require('../services/messagesBotService');
 const { MessageRequest } = require('../models/messagesBot');
+const { getBotMessages } = require('../services/bot');
 
 class MessageBotController {
   constructor() {
@@ -10,14 +11,10 @@ class MessageBotController {
     const funcTag = '[MessageBotController.create]';
     try {
       console.log(`${funcTag} Iniciando criação de mensagem...`);
-      console.log(`${funcTag} Dados recebidos:`, req.body);
-
-      const msgRequest = new MessageRequest(null, req.body.message);
-      console.log(`${funcTag} Dados formatados:`, msgRequest);
-
+      const msgRequest = new MessageRequest(null, req.body.message, req.body.action);
       const result = await this.messagesBotService.create(msgRequest);
-      console.log(`${funcTag} Mensagem criada com sucesso:`, result);
-
+      console.log(`${funcTag} Mensagem criada com sucesso`);
+      getBotMessages();
       res.status(result.status || 201).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao criar mensagem:`, error);
@@ -30,7 +27,7 @@ class MessageBotController {
     try {
       console.log(`${funcTag} Buscando todas as mensagens...`);
       const result = await this.messagesBotService.readAll();
-      console.log(`${funcTag} Mensagens encontradas:`, result);
+      console.log(`${funcTag} Mensagens encontradas`);
       res.status(result.status || 200).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao buscar mensagens:`, error);
@@ -44,13 +41,10 @@ class MessageBotController {
       const { id } = req.params;
       console.log(`${funcTag} Atualizando mensagem com ID: ${id}`);
       console.log(`${funcTag} Dados recebidos:`, req.body);
-
-      const msgRequest = new MessageRequest(id, req.body.message);
-      console.log(`${funcTag} Dados formatados:`, msgRequest);
-
-      const result = await this.messagesBotService.update(id, msgRequest);
-      console.log(`${funcTag} Mensagem atualizada com sucesso:`, result);
-
+      const msgRequest = new MessageRequest(id, req.body.message, req.body.action);
+      const result = await this.messagesBotService.update(msgRequest);
+      console.log(`${funcTag} Mensagem atualizada com sucesso`);
+      getBotMessages();
       res.status(result.status || 200).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao atualizar mensagem:`, error);
@@ -63,10 +57,9 @@ class MessageBotController {
     try {
       const { id } = req.params;
       console.log(`${funcTag} Deletando mensagem com ID: ${id}`);
-
       const result = await this.messagesBotService.delete(id);
-      console.log(`${funcTag} Mensagem deletada com sucesso:`, result);
-
+      console.log(`${funcTag} Mensagem deletada com sucesso`);
+      getBotMessages();
       res.status(result.status || 200).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao deletar mensagem:`, error);
