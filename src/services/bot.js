@@ -55,60 +55,65 @@ async function startBot() {
     const menuWords = ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "menu"];
 
     if (/^\d+$/.test(msg.body) && msg.from.endsWith("@c.us")) {
-      const chat = await msg.getChat();
-      await delay(3000);
-      await chat.sendStateTyping();
-      await delay(3000);
+      const chat = await getChat(msg)
       // Busca opções dinâmicas da API
       const option = botMsgs.data.find(m => { return m.idx == msg.body });
-      console.log(`${funcTag} Opções encontradas:`, option);
-
       if (option) {
-        console.log(`${funcTag} Enviando mensagem:`, option.message);
-        await client.sendMessage(msg.from, option.message);
-        // Executa ação especial se existir
-        if (option.action === "send_boleto") {
-          const boletoPath = path.join(__dirname, "boleto.pdf");
-          if (fs.existsSync(boletoPath)) {
-            const pdf = MessageMedia.fromFilePath(boletoPath);
-            await client.sendMessage(msg.from, pdf);
-          } else {
-            await client.sendMessage(
-              msg.from,
-              'Desculpe, não encontrei o boleto neste momento. Por favor, entre em contato com um atendente digitando "5".'
-            );
-          }
-        }
-        if (option.action === "mark_unread") {
-          console.log(`${funcTag} Marcando mensagem como não lida`);
-          chat.markUnread();
-        }
+        await optionsMsg(msg, chat, option)
       } else {
         await client.sendMessage(msg.from, 'Por favor, escolha uma das opções válidas. Caso precise, digite "Menu" para ver as opções novamente.');
       }
     }
 
     if (menuWords.includes(texto)) {
-      const chat = await msg.getChat();
-      await delay(3000);
-      await chat.sendStateTyping();
-      await delay(3000);
-      // Primeira mensagem do menu (action: 'menu', idx: '1')
-      const contact = await msg.getContact();
-      const name = contact.pushname ? contact.pushname.split(' ')[0] : 'usuário';
-      const menuMsg = botMsgs.data.find(m => m.action === "menu");
-      if (menuMsg) {
-        const personalizedMsg = menuMsg.message.replace('${name}', name);
-        await client.sendMessage(msg.from, personalizedMsg);
-      }
-      await chat.sendStateTyping();
-      await delay(3000);  
-      await client.sendMessage(msg.from, 'Você pode digitar "Menu" a qualquer momento para ver novamente as opções.');
+      const chat = getChat(msg)
+      await menuMsg(msg, chat);
     }
   });
 
   console.log(`${funcTag} Initialize bot...`);
   client.initialize();
+}
+
+async function getChat(msg){
+  const chat = await msg.getChat();
+  await delay(3000);
+  await chat.sendStateTyping();
+  await delay(3000);
+  return chat;
+}
+
+async function optionsMsg(msg, chat, option) {
+  await client.sendMessage(msg.from, option.message);
+  // Executa ação especial se existir
+  if (option.action === "send_boleto") {
+    const boletoPath = path.join(__dirname, "boleto.pdf");
+    if (fs.existsSync(boletoPath)) {
+      const pdf = MessageMedia.fromFilePath(boletoPath);
+      await client.sendMessage(msg.from, pdf);
+    } else {
+      await client.sendMessage(
+        msg.from,
+        'Desculpe, não encontrei o boleto neste momento. Por favor, entre em contato com um atendente digitando "5".'
+      );
+    }
+  }
+  if (option.action === "mark_unread") {
+    chat.markUnread();
+  }
+}
+
+async function menuMsg(msg, chat) {
+  const contact = await msg.getContact();
+  const name = contact.pushname ? contact.pushname.split(' ')[0] : 'usuário';
+  const menuMsg = botMsgs.data.find(m => m.action === "menu");
+  if (menuMsg) {
+    const personalizedMsg = menuMsg.message.replace('${name}', name);
+    await client.sendMessage(msg.from, personalizedMsg);
+  }
+  await chat.sendStateTyping();
+  await delay(3000);  
+  await client.sendMessage(msg.from, 'Você pode digitar "Menu" a qualquer momento para ver novamente as opções.');
 }
 
 async function generateQr() {
