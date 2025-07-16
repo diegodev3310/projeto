@@ -3,6 +3,7 @@ const path = require("path");
 const dotenv = require('dotenv');
 const qrcodeImage = require("qrcode");
 const { Client, MessageMedia, LocalAuth } = require("whatsapp-web.js");
+const { createEvent } = require('./calendar');
 
 dotenv.config(path.resolve(__dirname, '../../.env'));
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -22,7 +23,7 @@ async function startBot() {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
-    authStrategy: new LocalAuth({ dataPath: `../wwebjs_auth/` }),
+    authStrategy: new LocalAuth({ dataPath: path.resolve(process.cwd(), '.wwebjs_auth') }),
   });
 
   // Dispara quando QR gerado
@@ -64,9 +65,22 @@ async function startBot() {
         await client.sendMessage(msg.from, 'Por favor, escolha uma das opções válidas. Caso precise, digite "Menu" para ver as opções novamente.');
       }
     }
-
+    if (msg.body.match(/agendar|agendamento/i) && msg.from.endsWith("@c.us")) {
+      const chat = await getChat(msg);
+      const msgParsed = parseScheduling(msg.body);
+      const created = await createEvent(msgParsed);
+      if (created) {
+        await chat.sendStateTyping();
+        await delay(3000);
+        await client.sendMessage(msg.from, 'Obrigado, você ira receber o agendamento no seu email e no seu Google Calendas.');
+      } else {
+        await chat.sendStateTyping();
+        await delay(3000);
+        await client.sendMessage(msg.from, 'Erro ao agendar. Por favor, tente novamente mais tarde ou entre em contato com um atendente digitando "5".');
+      }
+    }
     if (menuWords.includes(texto)) {
-      const chat = getChat(msg)
+      const chat = await getChat(msg)
       await menuMsg(msg, chat);
     }
   });
@@ -114,6 +128,53 @@ async function menuMsg(msg, chat) {
   await chat.sendStateTyping();
   await delay(3000);  
   await client.sendMessage(msg.from, 'Você pode digitar "Menu" a qualquer momento para ver novamente as opções.');
+}
+
+function parseScheduling(msg) {
+  // Regex para cada campo
+  const nameMatch = msg.match(/nome completo[:\-]?\s*(.*)/i);
+  const specialtyMatch = msg.match(/especialidade desejada[:\-]?\s*(.*)/i);
+  const dateMatch = msg.match(/data e hora preferida[:\-]?\s*(.*)/i);
+  const convenioMatch = msg.match(/conv[êe]nio*[:\-]?\s*(.*)/i);
+  const emailMatch = msg.match(/email[:\-]?\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+
+  // Converte data para formato ISO e calcula dateEnd +1 hora
+  let dateInit = null;
+  let dateEnd = null;
+  if (dateMatch && dateMatch[1]) {
+    // Aceita formatos tipo 10/07/2025 10:00 ou 2025-07-10 10:00
+    let raw = dateMatch[1].trim();
+    let dt = null;
+    // Tenta dd/mm/yyyy hh:mm
+    const brMatch = raw.match(/(\d{2})\/(\d{2})\/(\d{4})[\sT]*(\d{2}):(\d{2})/);
+    if (brMatch) {
+      dt = new Date(`${brMatch[3]}-${brMatch[2]}-${brMatch[1]}T${brMatch[4]}:${brMatch[5]}:00-03:00`);
+    } else {
+      // Tenta yyyy-mm-dd hh:mm
+      const isoMatch = raw.match(/(\d{4})-(\d{2})-(\d{2})[\sT]*(\d{2}):(\d{2})/);
+      if (isoMatch) {
+        dt = new Date(`${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}T${isoMatch[4]}:${isoMatch[5]}:00-03:00`);
+      }
+    }
+    if (dt) {
+      dateInit = dt.toISOString();
+      // Soma 1 hora para dateEnd
+      const dtEnd = new Date(dt.getTime() + 60 * 60 * 1000);
+      dateEnd = dtEnd.toISOString();
+    } else {
+      dateInit = raw;
+      dateEnd = raw;
+    }
+  }
+  console.log('dateInit', dateInit, 'dateEnd', dateEnd);
+  return {
+    name: nameMatch ? nameMatch[1].trim() : null,
+    specialty: specialtyMatch ? specialtyMatch[1].trim() : null,
+    convenio: convenioMatch ? convenioMatch[1].trim() : null,
+    email: emailMatch ? emailMatch[1] : null,
+    dateInit,
+    dateEnd
+  };
 }
 
 async function generateQr() {
