@@ -14,7 +14,8 @@ class MessagesBotRepository {
       VALUES ($1,
         (SELECT id FROM messages_actions WHERE action = $2)
       )RETURNING id, createdAt;`;
-      const values = [messageReq.message, messageReq.action];
+      const message = messageReq.message.replace(/\//g, "&#x2F;");
+      const values = [message, messageReq.action];
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem inserida com sucesso`);
       return res.rows[0];
@@ -58,7 +59,8 @@ class MessagesBotRepository {
       let query = 'UPDATE messages_bot SET message = $1, updatedAt = CURRENT_TIMESTAMP ';
       messageReq.action ? query += ', action = (SELECT id FROM messages_actions WHERE action = $3)' : '';
       query += 'WHERE id = $2 RETURNING id, updatedAt'
-      const values = [messageReq.message, messageReq.id];
+      const message = messageReq.message.replace(/&#x2F;/g, "/");
+      const values = [message, messageReq.id];
       if (messageReq.action) { values.push(messageReq.action); }
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem atualizada`);
