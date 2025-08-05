@@ -11,7 +11,7 @@ class MessageBotController {
     const funcTag = '[MessageBotController.create]';
     try {
       console.log(`${funcTag} Iniciando criação de mensagem...`);
-      const msgRequest = new MessageRequest(null, req.body.message, req.body.action);
+      const msgRequest = new MessageRequest(null, req.body.message, req.body.logical_key, req.body.node_type, req.body.initial_node);
       const result = await this.messagesBotService.create(msgRequest);
       console.log(`${funcTag} Mensagem criada com sucesso`);
       getBotMessages();
@@ -35,14 +35,13 @@ class MessageBotController {
     }
   }
 
-  async update(req, res) {
-    const funcTag = '[MessageBotController.update]';
+  async updateMessage(req, res) {
+    const funcTag = '[MessageBotController.updateMessage]';
     try {
-      const { id } = req.params;
-      console.log(`${funcTag} Atualizando mensagem com ID: ${id}`);
+      console.log(`${funcTag} Atualizando mensagem com logical_key: ${logical_key}`);
       console.log(`${funcTag} Dados recebidos:`, req.body);
-      const msgRequest = new MessageRequest(id, req.body.message, req.body.action);
-      const result = await this.messagesBotService.update(msgRequest);
+      const msgRequest = new MessageRequest(null, req.body.message, req.body.logical_key);
+      const result = await this.messagesBotService.updateMessage(msgRequest);
       console.log(`${funcTag} Mensagem atualizada com sucesso`);
       getBotMessages();
       res.status(result.status || 200).json(result);
@@ -55,9 +54,9 @@ class MessageBotController {
   async delete(req, res) {
     const funcTag = '[MessageBotController.delete]';
     try {
-      const { id } = req.params;
-      console.log(`${funcTag} Deletando mensagem com ID: ${id}`);
-      const result = await this.messagesBotService.delete(id);
+      const { logical_key } = req.params;
+      console.log(`${funcTag} Deletando mensagem com logical_key: ${logical_key}`);
+      const result = await this.messagesBotService.delete(logical_key);
       console.log(`${funcTag} Mensagem deletada com sucesso`);
       getBotMessages();
       res.status(result.status || 200).json(result);
