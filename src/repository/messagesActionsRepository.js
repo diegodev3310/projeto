@@ -8,8 +8,8 @@ class MessagesActionsRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Inserindo ação no DB`);
-      const query = 'INSERT INTO messages_actions(action) VALUES ($1) RETURNING id, createdAt';
-      const values = [actionReq.action];
+      const query = 'INSERT INTO messages_actions(action_type, bot_message_id) VALUES ($1, $2) RETURNING id, createdAt';
+      const values = [actionReq.action_type, actionReq.bot_message_id];
       const res = await db.query(query, values);
       console.log(`${funcTag} Ação inserida com sucesso`);
       return res.rows[0];
@@ -24,7 +24,7 @@ class MessagesActionsRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Recuperando ações no DB`);
-      const query = 'SELECT id, action, createdAt FROM messages_actions ORDER BY createdAt';
+      const query = 'SELECT id, action_type, createdAt FROM messages_actions ORDER BY createdAt';
       const res = await db.query(query);
       console.log(`${funcTag} Ações recuperadas`);
       return res.rows;
@@ -39,8 +39,8 @@ class MessagesActionsRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Atualizando ação com ID: ${actionReq.id}`);
-      const query = 'UPDATE messages_actions SET action = $1, updatedAt = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, updatedAt';
-      const values = [actionReq.action, actionReq.id];
+      const query = 'UPDATE messages_actions SET action_type = $1, bot_message_id = $2, updatedAt = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, updatedAt';
+      const values = [actionReq.action_type, actionReq.bot_message_id, actionReq.id];
       const res = await db.query(query, values);
       console.log(`${funcTag} Ação atualizada`);
       return res.rows[0];

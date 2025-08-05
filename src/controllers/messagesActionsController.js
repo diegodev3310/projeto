@@ -10,7 +10,7 @@ class MessagesActionsController {
     const funcTag = '[MessagesActionsController.create]';
     try {
       console.log(`${funcTag} Requisição recebida para criar uma nova ação.`);
-      const messageActionReq = new MessageActionRequest(null, req.body.action);
+      const messageActionReq = new MessageActionRequest(null, req.body.action_type, req.body.bot_message_id);
       const result = await this.messagesActionsService.create(messageActionReq);
       return res.status(result.status).json(result);
     } catch (error) {
@@ -36,7 +36,7 @@ class MessagesActionsController {
     try {
       const { id } = req.params;
       console.log(`${funcTag} Requisição para atualizar ação com ID: ${id}`);
-      const messageActionReq = new MessageActionRequest(id, req.body.action);
+      const messageActionReq = new MessageActionRequest(id, req.body.action_type);
       const result = await this.messagesActionsService.update(messageActionReq);
       return res.status(result.status).json(result);
     } catch (error) {
