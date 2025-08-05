@@ -38,8 +38,7 @@ class MessageBotController {
   async updateMessage(req, res) {
     const funcTag = '[MessageBotController.updateMessage]';
     try {
-      console.log(`${funcTag} Atualizando mensagem com logical_key: ${logical_key}`);
-      console.log(`${funcTag} Dados recebidos:`, req.body);
+      console.log(`${funcTag} Atualizando mensagem com logical_key: ${req.body.logical_key}`);
       const msgRequest = new MessageRequest(null, req.body.message, req.body.logical_key);
       const result = await this.messagesBotService.updateMessage(msgRequest);
       console.log(`${funcTag} Mensagem atualizada com sucesso`);
