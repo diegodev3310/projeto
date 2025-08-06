@@ -52,8 +52,8 @@ class MessagesBotRepository {
       const db = await Database.connect();
       console.log(`${funcTag} Atualizando mensagem com ID: ${messageReq.id}`);
       let query = `
-      UPDATE messages_bot SET message = $1, updatedAt = CURRENT_TIMESTAMP 
-      WHERE logical_key = $2 RETURNING id, updatedAt`;
+      UPDATE messages_bot SET message = $1, updated_at = CURRENT_TIMESTAMP 
+      WHERE logical_key = $2 RETURNING id, updated_at`;
       const values = [messageReq.message, messageReq.logical_key];
       if (messageReq.action) { values.push(messageReq.action); }
       const res = await db.query(query, values);

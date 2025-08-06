@@ -53,8 +53,8 @@ class MessagesTransitionsRepository {
       SET source_message_id = (SELECT id FROM messages_bot WHERE logical_key = $1),
           target_message_id = (SELECT id FROM messages_bot WHERE logical_key = $2),
           trigger_pattern = $3,
-          updatedAt = CURRENT_TIMESTAMP 
-      WHERE id = $4 RETURNING id, updatedAt;`;
+          updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $4 RETURNING id, updated_at;`;
       const values = [actionReq.source_message_key, actionReq.target_message_key, actionReq.trigger_pattern, actionReq.id];
       const res = await db.query(query, values);
       console.log(`${funcTag} Transição atualizada`);

@@ -39,7 +39,10 @@ class MessagesActionsRepository {
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Atualizando ação com ID: ${actionReq.id}`);
-      const query = 'UPDATE messages_actions SET action_type = $1, bot_message_id = $2, updatedAt = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, updatedAt';
+      const query = `
+      UPDATE messages_actions SET action_type = $1, bot_message_id = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3
+      RETURNING id, updated_at`;
       const values = [actionReq.action_type, actionReq.bot_message_id, actionReq.id];
       const res = await db.query(query, values);
       console.log(`${funcTag} Ação atualizada`);
