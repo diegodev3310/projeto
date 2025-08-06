@@ -22,9 +22,9 @@ function router(express) {
   router.get('/status', botCtrl.getClientStatus.bind(botCtrl));
 
   router.get('/product/:productCode/:quantityCode', productsCtrl.readProd.bind(productsCtrl));
-  router.post('/product', externalAccessAuth, productsCtrl.createProd.bind(productsCtrl));
-  router.put('/product/:id', externalAccessAuth, productsCtrl.updateProd.bind(productsCtrl));
-  router.delete('/product/:id', externalAccessAuth, productsCtrl.deleteProd.bind(productsCtrl));
+  router.post('/product', externalAccessAuth, productsCtrl.create.bind(productsCtrl));
+  router.put('/product/:id', externalAccessAuth, productsCtrl.update.bind(productsCtrl));
+  router.delete('/product/:id', externalAccessAuth, productsCtrl.delete.bind(productsCtrl));
 
   router.get('/transitions', messagesTransitionsCtrl.readAll.bind(messagesTransitionsCtrl));
   router.post('/transitions', externalAccessAuth, messagesTransitionsCtrl.create.bind(messagesTransitionsCtrl));
@@ -33,7 +33,7 @@ function router(express) {
 
   router.get('/messages', messagesBotCtrl.readAll.bind(messagesBotCtrl));
   router.post('/messages', externalAccessAuth, messagesBotCtrl.create.bind(messagesBotCtrl));
-  router.put('/messages/:id', externalAccessAuth, messagesBotCtrl.updateMessage.bind(messagesBotCtrl));
+  router.put('/messages', externalAccessAuth, messagesBotCtrl.updateMessage.bind(messagesBotCtrl));
   router.delete('/messages/:id', externalAccessAuth, messagesBotCtrl.delete.bind(messagesBotCtrl));
 
   return router;
