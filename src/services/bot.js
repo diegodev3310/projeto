@@ -10,14 +10,14 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 let client = null;
 let lastQrUrl = null;
 let status = 'desconectado';
+let botMsgs = null;
 
 async function startBot() {
   const funcTag = "[startBot]";
   console.log(`${funcTag} Iniciando Client...`);
-  const botMsgs = await getBotMessages();
+  await getBotMessages();
   const transitions = await getTransitions();
-  let product = {}
-  let lastMensage = null;
+  const chatStates = new Map();
 
   status = 'iniciando';
   client = new Client({
@@ -54,6 +54,14 @@ async function startBot() {
     client.on("message", async msg => {
       const texto = msg.body.trim().toLowerCase();
       const chat = await getChat(msg);
+      if (chat.isGroup) return;
+      console.log(`${funcTag} Mensagem recebida`);
+      let state = chatStates.get(msg.from);
+      if (!state) {
+        state = { product: {}, lastMensage: null };
+        chatStates.set(msg.from, state);
+      }
+      let { product, lastMensage } = state;
 
       if (texto === 'menu') {
         lastMensage = null;
@@ -62,16 +70,18 @@ async function startBot() {
       if (texto === 'oi' || texto === 'menu') {
         lastMensage = botMsgs.data.find(m => m.initial_node === true);
         console.log(`${funcTag} Mensagem encontrada`);
+        updateState(msg, product, lastMensage);
         await sendAutoSequence(msg, chat, lastMensage, product, transitions, botMsgs);
       } else {
         if (!lastMensage) return;
         const nodeArr = transitions.data.filter(m => m.source_message_id === lastMensage.id);
-        console.log(`${funcTag} Nodes encontrados: ${JSON.stringify(nodeArr)}`);
+        console.log(`${funcTag} Nodes encontrados`);
         const nextNode = nodeArr.find(n => texto.match(n.trigger_pattern));
         if (!nextNode) return;
         console.log(`${funcTag} Mensagem encontrada`);
         await checkLogicalKey(product, lastMensage.logical_key, texto);
         lastMensage = botMsgs.data.find(m => m.id === nextNode.target_message_id);
+        updateState(msg, product, lastMensage);
         await sendAutoSequence(msg, chat, lastMensage, product, transitions, botMsgs);
       }
     });
@@ -92,6 +102,18 @@ async function startBot() {
       }
     }
 
+    function updateState(msg, product, lastMensage) {
+      console.log(`${funcTag} Atualizando estado do chat`);
+      let state = chatStates.get(msg.from);
+      if (!state) {
+        state = { product: {}, lastMensage: null };
+        chatStates.set(msg.from, state);
+      }
+      state.product = product;
+      state.lastMensage = lastMensage;
+      chatStates.set(msg.from, state);
+      console.log(`${funcTag} Estado atualizado: ${JSON.stringify(state)}`);
+    }
   console.log(`${funcTag} Initialize bot...`);
   client.initialize();
 }
@@ -329,7 +351,7 @@ async function getBotMessages() {
   try {
     const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/messages`
     console.log(`${funcTag} Atualizando mensagens do bot`);
-    const botMsgs = await fetch(url)
+    botMsgs = await fetch(url)
     .then(async resp => {
       const json = await resp.json();
       return json;
@@ -337,7 +359,6 @@ async function getBotMessages() {
       console.log(`${funcTag} Erro recuperando mensagens`)
     );
     console.log(`${funcTag} Mensagens do bot atualizadas com sucesso`);
-    return botMsgs;
   } catch (error) {
     console.log(`${funcTag} Erro ao buscar mensagens do bot:`, error);
     throw error;
