@@ -100,6 +100,7 @@ async function startBot() {
         if (!autoNode) break;
         currentMsg = botMsgs.data.find(m => m.id === autoNode.target_message_id);
       }
+      updateState(msg, product, currentMsg);
     }
 
     function updateState(msg, product, lastMensage) {
@@ -112,7 +113,7 @@ async function startBot() {
       state.product = product;
       state.lastMensage = lastMensage;
       chatStates.set(msg.from, state);
-      console.log(`${funcTag} Estado atualizado: ${JSON.stringify(state)}`);
+      console.log(`${funcTag} Estado atualizado`);
     }
   console.log(`${funcTag} Initialize bot...`);
   client.initialize();
