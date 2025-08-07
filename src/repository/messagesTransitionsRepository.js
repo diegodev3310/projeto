@@ -3,7 +3,7 @@ const { Database } = require('./database');
 class MessagesTransitionsRepository {
   constructor() {}
 
-  async insert(actionReq) {
+  async insert(transitionReq) {
     const funcTag = '[MessagesTransitionsRepository.insert]';
     try {
       const db = await Database.connect();
@@ -18,7 +18,7 @@ class MessagesTransitionsRepository {
           (SELECT id FROM messages_bot WHERE logical_key = $2),
           $3
       );`;
-      const values = [actionReq.source_message_key, actionReq.target_message_key, actionReq.trigger_pattern];
+      const values = [transitionReq.source_message_id, transitionReq.target_message_id, transitionReq.trigger_pattern];
       const res = await db.query(query, values);
       console.log(`${funcTag} Transição inserida com sucesso`);
       return res.rows[0];
