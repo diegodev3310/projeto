@@ -1,5 +1,6 @@
 const { MessagesTransitionsService } = require('../services/messagesTransitionsService');
 const { MessageTransitionsRequest } = require('../models/messagesTransitions');
+const { getTransitions } = require('../services/bot');
 
 class MessageTransitionsController {
   constructor() {
@@ -10,9 +11,10 @@ class MessageTransitionsController {
     const funcTag = '[MessageTransitionsController.create]';
     try {
       console.log(`${funcTag} Iniciando criação de transição...`);
-      const transitionRequest = new MessageTransitionsRequest(null, req.body.from_message_id, req.body.to_message_id, req.body.condition);
+      const transitionRequest = new MessageTransitionsRequest(req.body.source_message_id, req.body.target_message_id, req.body.trigger_pattern);
       const result = await this.MessagesTransitionsService.create(transitionRequest);
       console.log(`${funcTag} Transição criada com sucesso`);
+      getTransitions();
       res.status(result.status || 201).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao criar transição:`, error);
@@ -40,10 +42,11 @@ class MessageTransitionsController {
       console.log(`${funcTag} Requisição para atualizar transição com ID: ${id}`);
       const transitionRequest = new MessageTransitionsRequest(id, req.body.from_message_id, req.body.to_message_id, req.body.condition);
       const result = await this.MessagesTransitionsService.update(transitionRequest);
-      return res.status(result.status).json(result);
+      getTransitions();
+      res.status(result.status).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao atualizar transição:`, error);
-      return res.status(500).json({ error: 'Erro ao atualizar transição' });
+      res.status(500).json({ error: 'Erro ao atualizar transição' });
     }
   }
 
@@ -53,10 +56,11 @@ class MessageTransitionsController {
       const { id } = req.params;
       console.log(`${funcTag} Requisição para deletar transição com ID: ${id}`);
       const result = await this.MessagesTransitionsService.delete(id);
-      return res.status(result.status).json(result);
+      getTransitions();
+      res.status(result.status).json(result);
     } catch (error) {
       console.error(`${funcTag} Erro ao deletar transição:`, error);
-      return res.status(500).json({ error: 'Erro ao deletar transição' });
+      res.status(500).json({ error: 'Erro ao deletar transição' });
     }
   }
 }
