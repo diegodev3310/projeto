@@ -77,7 +77,10 @@ async function startBot() {
         const nodeArr = transitions.data.filter(m => m.source_message_id === lastMensage.id);
         console.log(`${funcTag} Nodes encontrados`);
         const nextNode = nodeArr.find(n => texto.match(n.trigger_pattern));
-        if (!nextNode) return;
+        if (!nextNode) {
+          await client.sendMessage(msg.from, "Desculpe, não entendi sua resposta. Por favor, envie novamente ou digite 'menu' para voltar ao início.");
+          return;
+        }
         console.log(`${funcTag} Mensagem encontrada`);
         await checkLogicalKey(product, lastMensage.logical_key, texto);
         lastMensage = botMsgs.data.find(m => m.id === nextNode.target_message_id);
@@ -190,6 +193,10 @@ async function checkLogicalKey(product, logical_key, msg) {
         product.user_quant = msg;
         product.size = msg;
         break;
+      case 'fitas':
+        product.quantity_code = crachaOp();
+        product.fita_quant = msg;
+        break;
     }
   });
   console.log(`${funcTag} Chave lógica verificada`);
@@ -200,7 +207,7 @@ function replaceMessage(msg, product) {
   console.log(`${funcTag} Substituindo variáveis na mensagem`);
   let msgCopy = msg;
   if (msgCopy.includes('${valor}')) {
-    msgCopy = msgCopy.replace('${valor}', product.price);
+    msgCopy = msgCopy.replace('${valor}', product.total_price);
   }
   if (msgCopy.includes('${descricao}')) {
     msgCopy = msgCopy.replace('${descricao}', product.description);
@@ -211,8 +218,11 @@ function replaceMessage(msg, product) {
   if (msgCopy.includes('${metros}')) {
     msgCopy = msgCopy.replace('${metros}', product.size);
   }
-    if (msgCopy.includes('${tamanho}')) {
+  if (msgCopy.includes('${tamanho}')) {
     msgCopy = msgCopy.replace('${tamanho}', product.size);
+  }
+  if (msgCopy.includes('${fita_quant}')) {
+    msgCopy = msgCopy.replace('${fita_quant}', product.fita_quant);
   }
   return msgCopy;
 }
@@ -258,9 +268,14 @@ async function calculatePrice(product) {
   if (product.quantity_code === 'UND_1' || product.quantity_code === 'UND_2' || product.quantity_code === 'METRO_1') {
     console.log(`${funcTag} Calculando preço com quantidade do usuário: ${product.user_quant}`);
     if (product.user_quant) {
-      product.price = product.price * parseFloat(product.user_quant);
+      product.total_price = product.price * parseFloat(product.user_quant);
     }
   }
+  if (product.code === 'cracha_1') {
+    console.log(`${funcTag} Calculando preço com quantidade de fitas: ${product.fita_quant}`);
+    product.total_price += product.price * parseFloat(product.fita_quant);
+  }
+  console.log(`${funcTag} Preço calculado`);
 }
 
 // function parseScheduling(msg) {
@@ -409,4 +424,4 @@ async function searchProduct(product) {
   }
 }
 
-module.exports = { startBot, generateQr, getClient, getStatus, getBotMessages };
+module.exports = { startBot, generateQr, getClient, getStatus, getBotMessages, getTransitions };
