@@ -1,3 +1,4 @@
+const path = require('path');
 const dotenv = require('dotenv');
 const express = require('express');
 const app = express();
@@ -17,6 +18,9 @@ app.use(securityMiddleware());
 app.use('/api', router(express));
 // Servindo arquivos estáticos da pasta "public"
 app.use('/', express.static("public"));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
