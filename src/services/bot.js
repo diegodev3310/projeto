@@ -57,11 +57,22 @@ async function startBot() {
       if (chat.isGroup) return;
       console.log(`${funcTag} Mensagem recebida`);
       let state = chatStates.get(msg.from);
+      const now = Date.now();
       if (!state) {
-        state = { product: {}, lastMensage: null };
+        state = { product: {}, lastMensage: null, lastActive: now };
         chatStates.set(msg.from, state);
+      } else {
+        if (now - (state.lastActive || 0) > 3600000) {
+          state.product = {};
+          state.lastMensage = null;
+          state.lastActive = now;
+          chatStates.set(msg.from, state);
+        }
       }
       let { product, lastMensage } = state;
+
+      state.lastActive = now;
+      chatStates.set(msg.from, state);
 
       if (texto === 'menu') {
         lastMensage = null;
@@ -109,12 +120,14 @@ async function startBot() {
     function updateState(msg, product, lastMensage) {
       console.log(`${funcTag} Atualizando estado do chat`);
       let state = chatStates.get(msg.from);
+      const now = Date.now();
       if (!state) {
-        state = { product: {}, lastMensage: null };
+        state = { product: {}, lastMensage: null, lastActive: now };
         chatStates.set(msg.from, state);
       }
       state.product = product;
       state.lastMensage = lastMensage;
+      state.lastActive = now;
       chatStates.set(msg.from, state);
       console.log(`${funcTag} Estado atualizado`);
     }
