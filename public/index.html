@@ -148,20 +148,16 @@
       color: white;
       min-width: 180px;
     }
+    #loginButton {
+      margin-top: 15px;
+    }
+    #logoutButton {
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
-  <h1>Bot Flow</h1>
-  <h2>Controle do Bot WhatsApp</h2>
-  <button id="refreshQr">Recarregar QR</button>
-
-  <div id="status-global">Status: Desconectado</div>
-
-  <h3 style="margin-top:50px; color:#d0f4f7; font-weight: 400;">
-    Escaneie o(s) QR Code(s) com o WhatsApp
-  </h3>
-  <div id="qrcode"></div>
-
+  <div id="app"></div>
   <script src="./javascript/index.js" type="module"></script>
 </body>
 </html>
