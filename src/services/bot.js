@@ -380,7 +380,12 @@ async function getBotMessages() {
   try {
     const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/messages`
     console.log(`${funcTag} Atualizando mensagens do bot`);
-    botMsgs = await fetch(url)
+    const token = process.env.BOT_TOKEN;
+    botMsgs = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     .then(async resp => {
       const json = await resp.json();
       return json;
@@ -399,7 +404,12 @@ async function getTransitions() {
   try {
     const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/transitions`
     console.log(`${funcTag} Atualizando transições do bot`);
-    const transations = await fetch(url)
+    const token = process.env.BOT_TOKEN;
+    const transations = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     .then(async resp => {
       const json = await resp.json();
       return json;
@@ -420,7 +430,12 @@ async function searchProduct(product) {
     console.log(`${funcTag} Buscando produto: ${product.code} com quantidade: ${product.quantity_code}`);
     const url = `http://${process.env.DIR_IP}:${process.env.NODE_PORT}/api/product/${product.code}/${product.quantity_code}`
     console.log(`${funcTag} Buscando produto`);
-    const res = await fetch(url)
+    const token = process.env.BOT_TOKEN;
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     .then(async resp => {
       const json = await resp.json();
       return json;
