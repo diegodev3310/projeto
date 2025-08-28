@@ -10,12 +10,10 @@ class MessagesBotRepository {
       console.log(`${funcTag} Inserindo mensagem no DB`);
       
       const query = `
-      INSERT INTO messages_bot(message, action) 
-      VALUES ($1,
-        (SELECT id FROM messages_actions WHERE action = $2)
-      )RETURNING id, createdAt;`;
-      const message = messageReq.message.replace(/\//g, "&#x2F;");
-      const values = [message, messageReq.action];
+      INSERT INTO messages_bot (logical_key, message, node_type, initial_node) 
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;`;
+      const values = [messageReq.logical_key, messageReq.message, messageReq.node_type, messageReq.initial_node];
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem inserida com sucesso`);
       return res.rows[0];
@@ -31,17 +29,14 @@ class MessagesBotRepository {
       const db = await Database.connect();
       console.log(`${funcTag} Recuperando mensagens no DB`);
       const query = `
-      SELECT
-        mb.id,
-        mb.message,
-        ma.action,
-        ROW_NUMBER() OVER (PARTITION BY mb.action ORDER BY mb.createdAt) AS idx
-      FROM
-        messages_bot mb
-      LEFT JOIN
-        messages_actions ma ON mb.action = ma.id
-      ORDER BY
-        ma.action, idx;`;
+        SELECT
+          mb.*,
+          ma.action_type,
+          ma.action_parameters,
+          ma.execution_order
+        FROM messages_bot mb
+        LEFT JOIN messages_actions ma ON mb.id = ma.bot_message_id
+        ORDER by mb.created_at;`;
       const res = await db.query(query);
       console.log(`${funcTag} Mensagens recuperadas`);
       return res.rows;
@@ -51,16 +46,15 @@ class MessagesBotRepository {
     }
   }
 
-  async update(messageReq) {
+  async updateMessage(messageReq) {
     const funcTag = '[MessagesBotRepository.update]';
     try {
       const db = await Database.connect();
       console.log(`${funcTag} Atualizando mensagem com ID: ${messageReq.id}`);
-      let query = 'UPDATE messages_bot SET message = $1, updatedAt = CURRENT_TIMESTAMP ';
-      messageReq.action ? query += ', action = (SELECT id FROM messages_actions WHERE action = $3)' : '';
-      query += 'WHERE id = $2 RETURNING id, updatedAt'
-      const message = messageReq.message.replace(/&#x2F;/g, "/");
-      const values = [message, messageReq.id];
+      let query = `
+      UPDATE messages_bot SET message = $1, updated_at = CURRENT_TIMESTAMP 
+      WHERE logical_key = $2 RETURNING id, updated_at`;
+      const values = [messageReq.message, messageReq.logical_key];
       if (messageReq.action) { values.push(messageReq.action); }
       const res = await db.query(query, values);
       console.log(`${funcTag} Mensagem atualizada`);
@@ -71,13 +65,13 @@ class MessagesBotRepository {
     }
   }
 
-  async delete(id) {
+  async delete(logical_key) {
     const funcTag = '[MessagesBotRepository.delete]';
     try {
       const db = await Database.connect();
-      console.log(`${funcTag} Deletando mensagem com ID: ${id}`);
-      const query = 'DELETE FROM messages_bot WHERE id = $1 RETURNING id';
-      const res = await db.query(query, [id]);
+      console.log(`${funcTag} Deletando mensagem com logical_key: ${logical_key}`);
+      const query = 'DELETE FROM messages_bot WHERE logical_key = $1 RETURNING logical_key';
+      const res = await db.query(query, [logical_key]);
       console.log(`${funcTag} Mensagem deletada`);
       return res.rows[0];
     } catch (err) {
